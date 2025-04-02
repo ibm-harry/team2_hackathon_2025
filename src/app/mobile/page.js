@@ -1,22 +1,40 @@
 'use client'; // This tells Next.js that this is a client component
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function MobileScreen() {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const ws = new WebSocket('ws://localhost:3000'); // Connect to WebSocket server
+  const wsRef = useRef(null); // Use a ref to store the WebSocket instance
 
   // Handle WebSocket connection
   useEffect(() => {
+    const ws = new WebSocket('ws://localhost:3000'); // Connect to WebSocket server
+    wsRef.current = ws;
+
     ws.onopen = () => {
       console.log('WebSocket connection established');
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error', error);
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (typeof data.activeCard !== 'undefined') {
+          setActiveCardIndex(data.activeCard); // Update active card from server
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
     };
 
-    // Close the WebSocket connection when the component is unmounted
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Clean up WebSocket connection when the component is unmounted
     return () => {
       ws.close();
     };
@@ -26,8 +44,8 @@ export default function MobileScreen() {
     setActiveCardIndex(index);
 
     // Send the active card update via WebSocket to the server
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ activeCard: index }));
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ activeCard: index }));
     }
   };
 

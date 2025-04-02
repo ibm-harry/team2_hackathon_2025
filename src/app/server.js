@@ -6,7 +6,10 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+console.log('Starting Next.js app...');
+
 app.prepare().then(() => {
+  console.log('Next.js app is ready');
   const server = express();
 
   // Set up WebSocket server
@@ -33,13 +36,28 @@ app.prepare().then(() => {
 
   // Handle WebSocket connections
   wss.on('connection', (ws) => {
+    console.log('New WebSocket connection established');
     clients.push(ws);
 
     // Send the current active card when a new client connects
     ws.send(JSON.stringify({ activeCard }));
 
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message);
+        if (typeof data.activeCard !== 'undefined') {
+          activeCard = data.activeCard;
+          console.log(`Received activeCard update: ${activeCard}`);
+          broadcastActiveCard(); // Notify all connected clients
+        }
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
+      }
+    });
+
     // Remove client from the list on close
     ws.on('close', () => {
+      console.log('WebSocket connection closed');
       clients = clients.filter((client) => client !== ws);
     });
   });
@@ -47,9 +65,13 @@ app.prepare().then(() => {
   // Handle POST request to update the active card
   server.post('/api/activeCard', express.json(), (req, res) => {
     const { activeCard: newActiveCard } = req.body;
-    activeCard = newActiveCard;
-    broadcastActiveCard(); // Notify all connected clients
-    res.status(200).json({ success: true });
+    if (typeof newActiveCard === 'number') {
+      activeCard = newActiveCard;
+      broadcastActiveCard(); // Notify all connected clients
+      res.status(200).json({ success: true });
+    } else {
+      res.status(400).json({ error: 'Invalid activeCard value' });
+    }
   });
 
   // Handle all other requests via Next.js
