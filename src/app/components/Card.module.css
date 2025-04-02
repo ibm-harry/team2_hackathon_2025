@@ -15,3 +15,8 @@
 .heading {
   font-size: 100px;
 }
+
+.active {
+  border: 3px solid #4caf50; /* Green border for active card */
+  background-color: rgba(76, 175, 80, 0.1); /* Slight green background */
+}

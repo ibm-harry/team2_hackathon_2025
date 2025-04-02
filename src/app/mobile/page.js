@@ -1,47 +1,44 @@
-"use client";
+'use client'; // This tells Next.js that this is a client component
 
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 
 export default function MobileScreen() {
-  const cardsData = [
-    {
-      title: "Card Title 1",
-      content: "Content for card 1...",
-    },
-    {
-      title: "Card Title 2",
-      content: "Content for card 2...",
-    },
-    {
-      title: "Card Title 3",
-      content: "Content for card 3...",
-    },
-    {
-      title: "Card Title 4",
-      content: "Content for card 4...",
-    },
-    {
-      title: "Card Title 5",
-      content: "Content for card 5...",
-    },
-    {
-      title: "Card Title 6",
-      content: "Content for card 6...",
-    },
-  ];
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const ws = new WebSocket('ws://localhost:3000'); // Connect to WebSocket server
 
-  const [activeCardIndex, setActiveCardIndex] = useState(0); // State to track which card is active
+  // Handle WebSocket connection
+  useEffect(() => {
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error', error);
+    };
+
+    // Close the WebSocket connection when the component is unmounted
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const updateActiveCard = (index) => {
     setActiveCardIndex(index);
-    fetch("/api/activeCard", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ activeCard: cardsData[index].id }), // Send active card ID to backend
-    });
+
+    // Send the active card update via WebSocket to the server
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ activeCard: index }));
+    }
   };
+
+  const cardsData = [
+    { title: "Card Title 1", content: "Content for card 1..." },
+    { title: "Card Title 2", content: "Content for card 2..." },
+    { title: "Card Title 3", content: "Content for card 3..." },
+    { title: "Card Title 4", content: "Content for card 4..." },
+    { title: "Card Title 5", content: "Content for card 5..." },
+    { title: "Card Title 6", content: "Content for card 6..." },
+  ];
 
   return (
     <div>
