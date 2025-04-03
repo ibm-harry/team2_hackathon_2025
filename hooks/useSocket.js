@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_SERVER_URL = "https://main.dj188r1lh3muh.amplifyapp.com";
+const dev = process.env.NODE_ENV !== "production";
+const SOCKET_SERVER_URL = dev ? "https://localhost:3000" : "https://main.dj188r1lh3muh.amplifyapp.com" ;
 let socket = null; // Store a single socket instance
 
 export function useSocket() {
