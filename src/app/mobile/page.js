@@ -1,53 +1,10 @@
 'use client'; // This tells Next.js that this is a client component
 
 import { useState, useEffect, useRef } from 'react';
+import { useSocket } from "../../../hooks/useSocket";
 
 export default function MobileScreen() {
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const wsRef = useRef(null); // Use a ref to store the WebSocket instance
-
-  // Handle WebSocket connection
-  useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3000'); // Connect to WebSocket server
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (typeof data.activeCard !== 'undefined') {
-          setActiveCardIndex(data.activeCard); // Update active card from server
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-
-    // Clean up WebSocket connection when the component is unmounted
-    return () => {
-      ws.close();
-    };
-  }, []);
-
-  const updateActiveCard = (index) => {
-    setActiveCardIndex(index);
-
-    // Send the active card update via WebSocket to the server
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ activeCard: index }));
-    }
-  };
+    const { slide, changeSlide } = useSocket();
 
   const cardsData = [
     { title: "Card Title 1", content: "Content for card 1..." },
@@ -61,16 +18,16 @@ export default function MobileScreen() {
   return (
     <div>
       <h1>Mobile Control</h1>
-      <div>
+      <div style={{display: "flex", alignItems: "center", overflowX: "auto"}}>
         {cardsData.map((card, index) => (
           <button
             key={index}
-            onClick={() => updateActiveCard(index)}
+            onClick={() => changeSlide(index)}
             style={{
               margin: "8px",
               padding: "12px",
-              backgroundColor: index === activeCardIndex ? "#4caf50" : "#ccc",
-              color: index === activeCardIndex ? "#fff" : "#000",
+              backgroundColor: index === slide ? "#4caf50" : "#ccc",
+              color: index === slide ? "#fff" : "#000",
               borderRadius: "8px",
               border: "none",
               cursor: "pointer",
@@ -80,6 +37,32 @@ export default function MobileScreen() {
           </button>
         ))}
       </div>
+      <div style={{display: "flex", justifyContent: "center"}}>
+        <button
+          onClick={() => changeSlide(slide - 1)}
+          disabled={slide == 0}
+          style={{
+            margin: "8px",
+            padding: "12px",
+            backgroundColor: slide != 0 ? "#4caf50" : "#ccc",
+            color: slide != 0 ? "#fff" : "#000",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+          }}>&larr;</button>
+        <button
+          onClick={() => changeSlide(slide + 1)}
+          disabled={slide == 5}
+          style={{
+            margin: "8px",
+            padding: "12px",
+            backgroundColor: slide != 5 ? "#4caf50" : "#ccc",
+            color: slide != 5 ? "#fff" : "#000",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+          }}>&rarr;</button>
+        </div>
     </div>
   );
 }

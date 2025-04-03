@@ -2,39 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Card from './components/Card'; // Assuming you have a Card component
+import { useSocket } from "../../hooks/useSocket";
 
 export default function Home() {
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const [ws, setWs] = useState(null); // Store WebSocket instance
-
-  
-
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3000'); // Connect to WebSocket server
-    setWs(socket);
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (typeof data.activeCard !== 'undefined') {
-          setActiveCardIndex(data.activeCard); // Update the active card when the WebSocket message is received
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
-
-    // Clean up WebSocket connection when the component unmounts
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  const handleCardClick = (index) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ activeCard: index })); // Send the clicked card index to the server
-    }
-  };
+  const { slide } = useSocket();
 
   const cardsData = [
     { title: "Card Title 1", content: "Content for card 1..." },
@@ -46,13 +17,13 @@ export default function Home() {
   ];
 
   return (
-    <div>
+    <div style={{display: 'flex'}}>
       {cardsData.map((card, index) => (
         <Card
           key={index}
           title={card.title}
           content={card.content}
-          isActive={index === activeCardIndex}
+          isActive={index === slide}
           onClick={() => handleCardClick(index)} // Add onClick handler
         />
       ))}
