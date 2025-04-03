@@ -23,11 +23,15 @@ export default function Home() {
 
   // State to control the visibility of the overlay image
   const [showImage, setShowImage] = useState(true);
+  const [setSlide, setShowSlide] = useState(false);
 
   // Function to handle 'c' key press and toggle the image visibility
   const handleKeyPress = (e) => {
     if (e.key === 'c' || e.key === 'C') {
       setShowImage((prev) => !prev);
+    }
+    if (e.key === 'x' || e.key === 'X') {
+      setShowSlide((prev) => !prev);
     }
   };
 
@@ -45,23 +49,21 @@ export default function Home() {
     <>
     <div className="flex flex-col h-screen bg-gray-900 text-white" style={{maxHeight: "100vh", overflow: "hidden"}}>
       {/* Overlay Image */}
-      {showImage && (
-        <div className="fixed top-0 left-0 w-full h-full z-0" style={{backgroundImage: "url('RcX3gDMF.gif')", height: '100%', width: '100%', position: 'absolute', top: 0, left: 0, zIndex: 2}}>
+        <div className={`fixed top-0 left-0 w-full h-full z-0 fade ${showImage ? "show" : ""}`} style={{backgroundImage: "url('bg.png')", height: '100%', backgroundSize: 'contain', width: '100%', position: 'absolute', top: 0, left: 0, zIndex: 2}}>
         </div>
-      )}
     </div>
     <div className={styles.container}>
-      <div className={styles.slideContainer}>
+      <div className={styles.slideContainer} style={{overflow: 'auto'}}>
         {slides.map((img, index) => (
-          <div key={index} className={styles.slideWrapper}>
-            <div className={styles.slideContent}>
-              <img
+          <div key={index} className={styles.slideWrapper} style={{backgroundImage: `url('${setSlide ? 'Frame 3.png' : 'Frame 2.png'}')`, backgroundSize: 'cover', width: '10000px', height: '1000px'}}>
+            {/* <div className={styles.slideContent}> */}
+              {/* <img
                 src={img}
                 alt={`Slide ${index}`}
                 className={`${styles.image} ${
                   index === slide ? styles.activeImage : styles.inactiveImage
                 }`}
-              />
+              /> */}
               {showComments && comments
                 .filter(comment => comment.slideIndex === index)
                 .map(comment => (
@@ -78,7 +80,7 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
-            </div>
+            {/* </div> */}
           </div>
         ))}
       </div>
