@@ -1,6 +1,7 @@
 "use client";
 import { useSocket } from "../../../hooks/useSocket";
 import { useEffect, useRef, useState } from "react";
+import styles from './styles.module.css';
 
 export default function Controller() {
   const { slide, changeSlide, comments, addComment } = useSocket();
@@ -26,29 +27,24 @@ export default function Controller() {
 
   // Update click handler with improved debug
   const handleImageClick = (e, index) => {
-    console.log('Image clicked, comment mode:', isCommentMode);
-    if (!isCommentMode) {
-      console.log('Click ignored - not in comment mode');
-      return;
-    }
+    if (!isCommentMode) return;
     
     const rect = e.target.getBoundingClientRect();
     const scrollLeft = previewRef.current.scrollLeft;
     
-    // Simplify coordinate calculation
-    const x = ((e.clientX - rect.left + scrollLeft) / e.target.width) * 100;
-    const y = ((e.clientY - rect.top) / e.target.height) * 100;
+    // Calculate position as percentage relative to image dimensions
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
     
-    console.log('Click event:', { 
-      clientX: e.clientX,
-      clientY: e.clientY,
-      rect: rect,
-      scrollLeft: scrollLeft,
+    console.log('Click coordinates:', {
+      rawX: e.clientX - rect.left,
+      rawY: e.clientY - rect.top,
+      width: rect.width,
+      height: rect.height,
       calculatedX: x,
       calculatedY: y
     });
     
-    console.log('Opening comment input');
     setCommentInput({
       isOpen: true,
       text: "",
@@ -89,55 +85,35 @@ export default function Controller() {
   );
 
   return (
-    <div className="relative flex flex-col h-screen bg-gray-900 text-white overflow-hidden">
-      {/* Add comment mode indicator */}
+    <div className={styles.container}>
       {isCommentMode && (
-        <div className="fixed top-4 left-0 right-0 text-center bg-blue-500 py-2 z-30">
+        <div className={styles.notification}>
           Click anywhere on the image to add a comment
         </div>
       )}
       
-      <div
-        ref={previewRef}
-        className="flex-1 overflow-x-auto overflow-y-hidden"
-        style={{ scrollBehavior: 'smooth' }}
-      >
+      <div ref={previewRef} className={styles.imageContainer}>
         {slides.map((img, index) => (
-          <div 
-            key={index} 
-            className="relative h-screen"
-            style={{ minWidth: 'fit-content' }}
-          >
+          <div key={index} className={styles.slideWrapper}>
             <div className="relative h-full">
               <img
-                style={{
-                  height: '100vh',
-                  width: 'auto',
-                  objectFit: 'contain'
-                }}
+                className={`${styles.image} ${index === slide ? '' : 'opacity-50'}`}
                 src={img}
                 alt={`Slide ${index}`}
-                className={`transition ${
-                  index === slide ? "" : "opacity-50"
-                }`}
-                onClick={(e) => {
-                  console.log('Raw click event');
-                  handleImageClick(e, index);
-                }}
+                onClick={(e) => handleImageClick(e, index)}
               />
               {comments
                 .filter(comment => comment.slideIndex === index)
                 .map(comment => (
                   <div
                     key={comment.id}
-                    className="absolute w-6 h-6 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:bg-blue-600 group"
+                    className={styles.commentMarker}
                     style={{
                       left: `${comment.position.x}%`,
-                      top: `${comment.position.y}%`,
-                      zIndex: 50
+                      top: `${comment.position.y}%`
                     }}
                   >
-                    <div className="absolute hidden group-hover:block bg-black text-white p-2 rounded -translate-y-full whitespace-nowrap">
+                    <div className={styles.tooltip}>
                       {comment.text}
                     </div>
                   </div>
@@ -147,49 +123,37 @@ export default function Controller() {
         ))}
       </div>
 
-      {/* Updated Floating Comment Button with IBM styling */}
-      <div className="fixed left-0 bottom-0 p-6" style={{ zIndex: 9999, pointerEvents: 'none' }}>
+      <div className={styles.buttonContainer}>
         <button
-          className={`relative rounded-none p-4 font-medium text-white transition-all ${
-            isCommentMode 
-              ? 'bg-[#da1e28] hover:bg-[#fa4d56]' 
-              : 'bg-[#0f62fe] hover:bg-[#0353e9]'
-          }`}
+          className={`${styles.commentButton} ${isCommentMode ? styles.active : ''}`}
           onClick={toggleCommentMode}
-          style={{ 
-            pointerEvents: 'auto',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-          }}
         >
-          <span className="flex items-center gap-2">
+          <span className={styles.buttonContent}>
             {isCommentMode ? <CloseIcon /> : <CommentIcon />}
-            <span className="text-sm font-ibm-plex-sans">
-              {isCommentMode ? 'Cancel' : 'Add Comment'}
-            </span>
+            <span>{isCommentMode ? 'Cancel' : 'Add Comment'}</span>
           </span>
         </button>
       </div>
 
-      {/* Comment Input Modal - now as overlay */}
       {commentInput.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white rounded-lg p-4 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+        <div className={styles.modal}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
             <textarea
-              className="w-full h-32 p-2 text-black border rounded mb-4"
+              className={styles.modalTextarea}
               value={commentInput.text}
               onChange={(e) => setCommentInput(prev => ({ ...prev, text: e.target.value }))}
               placeholder="Enter your comment..."
               autoFocus
             />
-            <div className="flex justify-end gap-2">
+            <div className={styles.modalButtons}>
               <button
-                className="px-4 py-2 bg-gray-500 text-white rounded"
+                className={styles.buttonCancel}
                 onClick={() => setCommentInput({ isOpen: false, text: "", position: null, slideIndex: null })}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className={styles.buttonAdd}
                 onClick={handleCommentSubmit}
               >
                 Add
