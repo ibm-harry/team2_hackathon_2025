@@ -104,6 +104,9 @@
   padding: 16px;
   width: 100%;
   max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .buttonContent {
@@ -125,13 +128,11 @@
 }
 
 .modalTextarea {
-  width: 100%;
-  height: 128px;
-  padding: 8px;
+  height: 3rem;
+  resize: none;
   color: black;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  margin-bottom: 16px;
 }
 
 .modalButtons {
