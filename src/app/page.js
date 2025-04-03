@@ -21,7 +21,33 @@ export default function Home() {
     "/Frame 2.png"
   ];
 
+  // State to control the visibility of the overlay image
+  const [showImage, setShowImage] = useState(true);
+
+  // Function to handle 'c' key press and toggle the image visibility
+  const handleKeyPress = (e) => {
+    if (e.key === 'c' || e.key === 'C') {
+      setShowImage((prev) => !prev);
+    }
+  };
+
+  // Set up the key press listener on component mount and cleanup on unmount
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
   return (
+    <div className="flex flex-col h-screen bg-gray-900 text-white" style={{maxHeight: "100vh", overflow: "hidden"}}>
+      {/* Overlay Image */}
+      {showImage && (
+        <div className="fixed top-0 left-0 w-full h-full z-0" style={{backgroundImage: "url('RcX3gDMF.gif')", height: '100%', width: '100%', position: 'absolute', top: 0, left: 0}}>
+        </div>
+      )}
     <div className={styles.container}>
       <div className={styles.slideContainer}>
         {slides.map((img, index) => (
