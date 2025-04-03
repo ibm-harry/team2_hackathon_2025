@@ -9,7 +9,6 @@
 }
 
 .slideContainer {
-  display: flex;
   overflow-x: auto;
   width: 100%;
   scroll-behavior: smooth;
