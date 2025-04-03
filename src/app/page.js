@@ -5,34 +5,75 @@ import Card from './components/Card'; // Assuming you have a Card component
 import { useSocket } from "../../hooks/useSocket";
 
 export default function Home() {
-  const { slide } = useSocket();
+  const { slide, comments } = useSocket();
 
-  const cardsData = [
-    { title: "Card Title 1", content: "Content for card 1..." },
-    { title: "Card Title 2", content: "Content for card 2..." },
-    { title: "Card Title 3", content: "Content for card 3..." },
-    { title: "Card Title 4", content: "Content for card 4..." },
-    { title: "Card Title 5", content: "Content for card 5..." },
-    { title: "Card Title 6", content: "Content for card 6..." },
+  const slides = [
+    "/Frame 2.png"
   ];
 
+  // State to control the visibility of the overlay image
+  const [showImage, setShowImage] = useState(true);
+
+  // Function to handle 'c' key press and toggle the image visibility
+  const handleKeyPress = (e) => {
+    if (e.key === 'c' || e.key === 'C') {
+      setShowImage((prev) => !prev);
+    }
+  };
+
+  // Set up the key press listener on component mount and cleanup on unmount
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row', // Cards will be laid out horizontally
-      justifyContent: 'space-between', // Distribute the cards evenly
-      alignItems: 'stretch', // Make sure cards stretch to fill the height of the screen
-      height: '100vh', // Set the container to full viewport height
-      padding: '2rem', // Optional padding for spacing
-    }}>
-      {cardsData.map((card, index) => (
-        <Card
-          key={index}
-          title={card.title}
-          content={card.content}
-          isActive={index === slide}
-        />
-      ))}
+    <div className="flex flex-col h-screen bg-gray-900 text-white" style={{maxHeight: "100vh", overflow: "hidden"}}>
+      {/* Overlay Image */}
+      {showImage && (
+        <div className="fixed top-0 left-0 w-full h-full z-0" style={{backgroundImage: "url('RcX3gDMF.gif')", height: '100%', width: '100%', position: 'absolute', top: 0, left: 0}}>
+        </div>
+      )}
+
+
+      <div
+        className="flex overflow-x-scroll w-full py-4"
+        style={{ scrollBehavior: "smooth", display: "flex", overflowX: "auto" }}
+      >
+        {slides.map((img, index) => (
+          <div key={index} className="relative">
+            <img
+              style={{width: '10000px', height: '1000px'}}
+              src={img}
+              alt={`Slide ${index}`}
+              className={`h-32 mx-2 cursor-pointer transition ${
+                index === slide ? "border-4 border-blue-500" : "opacity-50"
+              }`}
+            />
+            {comments
+              .filter(comment => comment.slideIndex === index)
+              .map(comment => (
+                <div
+                  key={comment.id}
+                  className="absolute w-4 h-4 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 group"
+                  style={{
+                    left: `${comment.position.x}%`,
+                    top: `${comment.position.y}%`,
+                    zIndex: 10
+                  }}
+                >
+                  <div className="absolute hidden group-hover:block bg-black text-white p-2 rounded -translate-y-full whitespace-nowrap">
+                    {comment.text}
+                  </div>
+                </div>
+              ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
