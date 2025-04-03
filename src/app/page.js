@@ -1,11 +1,21 @@
-'use client'; // This tells Next.js that this is a client component
+'use client';
 
 import { useState, useEffect } from 'react';
-import Card from './components/Card'; // Assuming you have a Card component
 import { useSocket } from "../../hooks/useSocket";
+import styles from './styles.module.css';
 
 export default function Home() {
-  const { slide, comments } = useSocket();
+  const { slide, comments, showComments, toggleComments } = useSocket();
+  
+  const VisibilityIcon = () => (
+    <svg viewBox="0 0 32 32" width="24" height="24" fill="currentColor">
+      {showComments ? (
+        <path d="M30.94,15.66A16.69,16.69,0,0,0,16,5,16.69,16.69,0,0,0,1.06,15.66a1,1,0,0,0,0,.68A16.69,16.69,0,0,0,16,27,16.69,16.69,0,0,0,30.94,16.34,1,1,0,0,0,30.94,15.66ZM16,25c-5.3,0-10.9-3.93-13.91-9C5.1,10.93,10.7,7,16,7s10.9,3.93,13.91,9C26.9,21.07,21.3,25,16,25Z M16,11a5,5,0,1,0,5,5A5,5,0,0,0,16,11Z"/>
+      ) : (
+        <path d="M30.94,15.66A16.69,16.69,0,0,0,16,5,16.69,16.69,0,0,0,1.06,15.66a1,1,0,0,0,0,.68A16.69,16.69,0,0,0,16,27,16.69,16.69,0,0,0,30.94,16.34,1,1,0,0,0,30.94,15.66ZM16,25c-5.3,0-10.9-3.93-13.91-9C5.1,10.93,10.7,7,16,7s10.9,3.93,13.91,9C26.9,21.07,21.3,25,16,25ZM16,11a5,5,0,1,0,5,5A5,5,0,0,0,16,11Zm0,8a3,3,0,1,1,3-3A3,3,0,0,1,16,19Z"/>
+      )}
+    </svg>
+  );
 
   const slides = [
     "/Frame 2.png"
@@ -38,42 +48,47 @@ export default function Home() {
         <div className="fixed top-0 left-0 w-full h-full z-0" style={{backgroundImage: "url('RcX3gDMF.gif')", height: '100%', width: '100%', position: 'absolute', top: 0, left: 0}}>
         </div>
       )}
-
-
-      <div
-        className="flex overflow-x-scroll w-full py-4"
-        style={{ scrollBehavior: "smooth", display: "flex", overflowX: "auto" }}
-      >
+    <div className={styles.container}>
+      <div className={styles.slideContainer}>
         {slides.map((img, index) => (
-          <div key={index} className="relative">
-            <img
-              style={{width: '10000px', height: '1000px'}}
-              src={img}
-              alt={`Slide ${index}`}
-              className={`h-32 mx-2 cursor-pointer transition ${
-                index === slide ? "border-4 border-blue-500" : "opacity-50"
-              }`}
-            />
-            {comments
-              .filter(comment => comment.slideIndex === index)
-              .map(comment => (
-                <div
-                  key={comment.id}
-                  className="absolute w-4 h-4 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 group"
-                  style={{
-                    left: `${comment.position.x}%`,
-                    top: `${comment.position.y}%`,
-                    zIndex: 10
-                  }}
-                >
-                  <div className="absolute hidden group-hover:block bg-black text-white p-2 rounded -translate-y-full whitespace-nowrap">
-                    {comment.text}
+          <div key={index} className={styles.slideWrapper}>
+            <div className={styles.slideContent}>
+              <img
+                src={img}
+                alt={`Slide ${index}`}
+                className={`${styles.image} ${
+                  index === slide ? styles.activeImage : styles.inactiveImage
+                }`}
+              />
+              {showComments && comments
+                .filter(comment => comment.slideIndex === index)
+                .map(comment => (
+                  <div
+                    key={comment.id}
+                    className={styles.commentMarker}
+                    style={{
+                      left: `${comment.position.x}%`,
+                      top: `${comment.position.y}%`
+                    }}
+                  >
+                    <div className={styles.tooltip}>
+                      <strong>{comment.name}</strong>: {comment.text}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
         ))}
       </div>
+      <button
+        className={styles.commentButton}
+        onClick={toggleComments}
+      >
+        <span className={styles.buttonContent}>
+          <VisibilityIcon />
+          <span>{showComments ? 'Hide Comments' : 'Show Comments'}</span>
+        </span>
+      </button>
     </div>
   );
 }

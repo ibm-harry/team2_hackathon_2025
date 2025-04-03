@@ -8,6 +8,7 @@ let socket = null; // Store a single socket instance
 export function useSocket() {
   const [slide, setSlide] = useState(0);
   const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(true);
 
   useEffect(() => {
     if (!socket) {
@@ -35,5 +36,9 @@ export function useSocket() {
     if (socket) socket.emit("add-comment", comment);
   };
 
-  return { slide, changeSlide, comments, addComment };
+  const toggleComments = () => {
+    setShowComments(prev => !prev);
+  };
+
+  return { slide, changeSlide, comments, addComment, showComments, toggleComments };
 }
