@@ -8,12 +8,7 @@ export default function Controller() {
   const [rotation, setRotation] = useState(0);
   
   const slides = [
-    "/1.jpg",
-    "/2.jpg",
-    "/3.jpg",
-    "/4.jpg",
-    "/5.jpg",
-    "/7.jpg"
+    "/Frame 2.png"
   ];
 
   const totalSlidesWidth = slides.length * 500;
@@ -61,7 +56,7 @@ export default function Controller() {
         {slides.map((img, index) => (
           <img
             key={index}
-            style={{width: '500px'}}
+            style={{width: '8000px', height: '800px'}}
             src={img}
             alt={`Slide ${index}`}
             className={`h-32 mx-2 cursor-pointer transition ${
