@@ -1,22 +1,81 @@
+/* Card.module.css */
+
 .main {
   display: flex;
   flex-direction: column;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px;
+  border: 1px solid #E0E0E0; /* Soft light gray border */
+  border-radius: 12px; /* Softer, more rounded corners */
+  padding: 2rem; /* Padding in rem for scalability */
+  margin: 1.5rem; /* Margin in rem for scalability */
   flex-grow: 1;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  height: 1000px;
-  background-color: red;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  background-color: #FFFFFF; /* Clean white background */
+  transition: all 0.3s ease-in-out; /* Smooth transition for hover and active states */
+  max-width: 30vw; /* Card should take up to 30% of the screen width */
+  max-height: 90vh; /* Cards should not exceed 90% of the screen height */
 }
 
 .heading {
-  font-size: 100px;
+  font-size: 2rem; /* Font size in rem for responsiveness */
+  font-weight: 600; /* Bold heading */
+  color: #2D2D2D; /* Dark gray text for better contrast */
+  margin: 1rem 0; /* Margin for spacing around text */
+}
+
+.content {
+  font-size: 1.25rem; /* Font size in rem for content */
+  color: #4C4F56; /* Lighter dark gray for content text */
+  margin-bottom: 1.5rem; /* Margin for spacing */
 }
 
 .active {
-  border: 3px solid #4caf50; /* Green border for active card */
-  background-color: rgba(76, 175, 80, 0.1); /* Slight green background */
+  border: 3px solid #0061F2; /* IBM Blue for active state */
+  background-color: rgba(0, 97, 242, 0.1); /* Slight blue background when active */
+}
+
+.main:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Slightly more prominent shadow on hover */
+  transform: translateY(-4px); /* Lift effect on hover */
+}
+
+/* Flexbox for scaling the layout */
+.card-container {
+  display: flex;
+  flex-wrap: wrap; /* Allows cards to wrap if there’s too much content */
+  justify-content: space-around; /* Evenly distribute cards horizontally */
+  gap: 2rem; /* Adds space between cards */
+  padding: 2rem;
+}
+
+/* Media Query for Smaller Screens */
+@media (max-width: 768px) {
+  .main {
+    max-width: 80vw; /* Take up more screen width on smaller screens */
+    padding: 1rem; /* Reduce padding for smaller screens */
+  }
+
+  .heading {
+    font-size: 1.75rem; /* Smaller font size for heading on small screens */
+  }
+
+  .content {
+    font-size: 1rem; /* Smaller content font size */
+  }
+}
+
+/* Media Query for Large Screens */
+@media (min-width: 1200px) {
+  .main {
+    max-width: 25vw; /* On large screens, cards should take up less space */
+    padding: 3rem; /* Increased padding on larger screens for spacious feel */
+  }
+
+  .heading {
+    font-size: 2.5rem; /* Larger heading font on larger screens */
+  }
+
+  .content {
+    font-size: 1.5rem; /* Larger content font on larger screens */
+  }
 }
