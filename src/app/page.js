@@ -17,14 +17,20 @@ export default function Home() {
   ];
 
   return (
-    <div style={{display: 'flex'}}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'row', // Cards will be laid out horizontally
+      justifyContent: 'space-between', // Distribute the cards evenly
+      alignItems: 'stretch', // Make sure cards stretch to fill the height of the screen
+      height: '100vh', // Set the container to full viewport height
+      padding: '2rem', // Optional padding for spacing
+    }}>
       {cardsData.map((card, index) => (
         <Card
           key={index}
           title={card.title}
           content={card.content}
           isActive={index === slide}
-          onClick={() => handleCardClick(index)} // Add onClick handler
         />
       ))}
     </div>
