@@ -10,11 +10,6 @@ const port = dev ? 3000 : 80;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-const httpsOptions = {
-  key: readFileSync("./ssl/key.pem"),
-  cert: readFileSync("./ssl/cert.pem"),
-};
-
 app.prepare().then(() => {
   const httpServer = createServer(handler);
   const io = new Server(httpServer, {
