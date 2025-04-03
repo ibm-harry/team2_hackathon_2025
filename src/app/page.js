@@ -36,7 +36,7 @@ export default function Home() {
                     }}
                   >
                     <div className={styles.tooltip}>
-                      {comment.text}
+                      <strong>{comment.name}</strong>: {comment.text}
                     </div>
                   </div>
                 ))}
