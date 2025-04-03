@@ -9,6 +9,7 @@ export default function Controller() {
   const [commentInput, setCommentInput] = useState({
     isOpen: false,
     text: "",
+    name: "",
     position: null,
     slideIndex: null
   });
@@ -48,6 +49,7 @@ export default function Controller() {
     setCommentInput({
       isOpen: true,
       text: "",
+      name: "",
       position: { x, y },
       slideIndex: index
     });
@@ -56,18 +58,19 @@ export default function Controller() {
 
   // Add handleCommentSubmit if it's missing
   const handleCommentSubmit = () => {
-    if (commentInput.text.trim()) {
+    if (commentInput.text.trim() && commentInput.name.trim()) {
       const newComment = {
         id: Date.now(),
         position: commentInput.position,
         slideIndex: commentInput.slideIndex,
-        text: commentInput.text
+        text: commentInput.text,
+        name: commentInput.name
       };
       
       console.log('Adding comment:', newComment);
       addComment(newComment);
+      setCommentInput({ isOpen: false, text: "", name: "", position: null, slideIndex: null });
     }
-    setCommentInput({ isOpen: false, text: "", position: null, slideIndex: null });
   };
 
   // Update the CommentIcon component with IBM-style icon
@@ -114,7 +117,7 @@ export default function Controller() {
                     }}
                   >
                     <div className={styles.tooltip}>
-                      {comment.text}
+                      <strong>{comment.name}</strong>: {comment.text}
                     </div>
                   </div>
                 ))}
@@ -138,23 +141,31 @@ export default function Controller() {
       {commentInput.isOpen && (
         <div className={styles.modal}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <input
+              type="text"
+              className={styles.modalInput}
+              value={commentInput.name}
+              onChange={(e) => setCommentInput(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Enter your name..."
+              autoFocus
+            />
             <textarea
               className={styles.modalTextarea}
               value={commentInput.text}
               onChange={(e) => setCommentInput(prev => ({ ...prev, text: e.target.value }))}
               placeholder="Enter your comment..."
-              autoFocus
             />
             <div className={styles.modalButtons}>
               <button
                 className={styles.buttonCancel}
-                onClick={() => setCommentInput({ isOpen: false, text: "", position: null, slideIndex: null })}
+                onClick={() => setCommentInput({ isOpen: false, text: "", name: "", position: null, slideIndex: null })}
               >
                 Cancel
               </button>
               <button
                 className={styles.buttonAdd}
                 onClick={handleCommentSubmit}
+                disabled={!commentInput.text.trim() || !commentInput.name.trim()}
               >
                 Add
               </button>
