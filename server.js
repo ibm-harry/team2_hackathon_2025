@@ -24,15 +24,22 @@ app.prepare().then(() => {
   });
 
   let currentSlide = 0; // Store slide index
+  let comments = []; // Store comments
 
   io.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
 
-    // Send the current slide to newly connected clients
+    // Send current state to newly connected clients
     socket.emit("update-slide", currentSlide);
+    socket.emit("update-comments", comments);
 
     socket.on("change-slide", (slide) => {
-      io.emit("update-slide", slide); // Broadcast slide change
+      io.emit("update-slide", slide);
+    });
+
+    socket.on("add-comment", (comment) => {
+      comments.push(comment);
+      io.emit("update-comments", comments);
     });
 
     socket.on("disconnect", () => {

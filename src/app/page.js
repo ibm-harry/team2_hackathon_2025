@@ -5,7 +5,7 @@ import Card from './components/Card'; // Assuming you have a Card component
 import { useSocket } from "../../hooks/useSocket";
 
 export default function Home() {
-  const { slide } = useSocket();
+  const { slide, comments } = useSocket();
 
   const slides = [
     "/Frame 2.png"
@@ -18,16 +18,33 @@ export default function Home() {
         style={{ scrollBehavior: "smooth", display: "flex", overflowX: "auto" }}
       >
         {slides.map((img, index) => (
-          <img
-            key={index}
-            style={{width: '10000px', height: '1000px'}}
-            src={img}
-            alt={`Slide ${index}`}
-            className={`h-32 mx-2 cursor-pointer transition ${
-              index === slide ? "border-4 border-blue-500" : "opacity-50"
-            }`}
-            onClick={() => changeSlide(index > slide ? "next" : "prev")}
-          />
+          <div key={index} className="relative">
+            <img
+              style={{width: '10000px', height: '1000px'}}
+              src={img}
+              alt={`Slide ${index}`}
+              className={`h-32 mx-2 cursor-pointer transition ${
+                index === slide ? "border-4 border-blue-500" : "opacity-50"
+              }`}
+            />
+            {comments
+              .filter(comment => comment.slideIndex === index)
+              .map(comment => (
+                <div
+                  key={comment.id}
+                  className="absolute w-4 h-4 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2 group"
+                  style={{
+                    left: `${comment.position.x}%`,
+                    top: `${comment.position.y}%`,
+                    zIndex: 10
+                  }}
+                >
+                  <div className="absolute hidden group-hover:block bg-black text-white p-2 rounded -translate-y-full whitespace-nowrap">
+                    {comment.text}
+                  </div>
+                </div>
+              ))}
+          </div>
         ))}
       </div>
     </div>
