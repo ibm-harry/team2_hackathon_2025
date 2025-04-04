@@ -62,7 +62,7 @@ export default function Controller() {
       const newComment = {
         id: Date.now(),
         position: commentInput.position,
-        slideIndex: commentInput.slideIndex,
+        slideIndex: slide,
         text: commentInput.text,
         name: commentInput.name
       };
@@ -112,12 +112,12 @@ export default function Controller() {
             <div className="relative h-full">
               <img
                 className={`${styles.image} ${index === slide ? '' : 'opacity-50'}`}
-                src={img}
+                src={slide ? 'Frame 3.png' : 'Frame 2.png'}
                 alt={`Slide ${index}`}
                 onClick={(e) => handleImageClick(e, index)}
               />
               {showComments && comments
-                .filter(comment => comment.slideIndex === index)
+                .filter(comment => comment.slideIndex === slide)
                 .map(comment => (
                   <div
                     key={comment.id}
@@ -128,7 +128,7 @@ export default function Controller() {
                     }}
                   >
                     <div className={styles.tooltip}>
-                      <strong>{comment.name}</strong>: {comment.text}
+                      <strong>{comment.slideIndex}</strong>: {comment.text}
                     </div>
                   </div>
                 ))}

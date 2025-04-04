@@ -18,7 +18,7 @@ app.prepare().then(() => {
     },
   });
 
-  let currentSlide = 0; // Store slide index
+  let currentSlide = false; // Store slide index
   let comments = []; // Store comments
 
   io.on("connection", (socket) => {
@@ -34,6 +34,11 @@ app.prepare().then(() => {
 
     socket.on("add-comment", (comment) => {
       comments.push(comment);
+      io.emit("update-comments", comments);
+    });
+
+    socket.on("new-comments", (newComments) => {
+      comments = newComments;
       io.emit("update-comments", comments);
     });
 

@@ -6,7 +6,7 @@ const SOCKET_SERVER_URL = dev ? "http://localhost:3000" : "http://13.41.230.83";
 let socket = null; // Store a single socket instance
 
 export function useSocket() {
-  const [slide, setSlide] = useState(0);
+  const [slide, setSlide] = useState(false);
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(true);
 
@@ -17,6 +17,7 @@ export function useSocket() {
 
     socket.on("update-slide", (newSlide) => {
       setSlide(newSlide);
+      console.log("Slide updated:", newSlide);
     });
 
     socket.on("update-comments", (newComments) => {
@@ -36,9 +37,13 @@ export function useSocket() {
     if (socket) socket.emit("add-comment", comment);
   };
 
+  const setNewComments = (comments) => {
+    if (socket) socket.emit("new-comments", comments);
+  };
+
   const toggleComments = () => {
     setShowComments(prev => !prev);
   };
 
-  return { slide, changeSlide, comments, addComment, showComments, toggleComments };
+  return { slide, changeSlide, comments, addComment, setNewComments, showComments, toggleComments };
 }

@@ -5,7 +5,9 @@ import { useSocket } from "../../hooks/useSocket";
 import styles from './styles.module.css';
 
 export default function Home() {
-  const { slide, comments, showComments, toggleComments } = useSocket();
+  const { slide, changeSlide, comments, setNewComments, showComments, toggleComments } = useSocket();
+  const [frame2Comments, setFrame2Comments] = useState([]);
+  const [frame3Comments, setFrame3Comments] = useState([]);
   
   const VisibilityIcon = () => (
     <svg viewBox="0 0 32 32" width="24" height="24" fill="currentColor">
@@ -25,13 +27,34 @@ export default function Home() {
   const [showImage, setShowImage] = useState(true);
   const [setSlide, setShowSlide] = useState(false);
 
+  console.log(comments)
+
+  let localslide = slide
+  let f2comments = comments
+  let f3comments = []
+
   // Function to handle 'c' key press and toggle the image visibility
   const handleKeyPress = (e) => {
     if (e.key === 'c' || e.key === 'C') {
       setShowImage((prev) => !prev);
     }
     if (e.key === 'x' || e.key === 'X') {
+      // if (!localslide) {
+      //   f2comments = comments
+      //   console.log("f2comments")
+      //   console.log(f2comments)
+      //   setNewComments(f3comments)
+      // } else {
+      //   f3comments = comments
+      //   console.log("f3comments")
+      //   console.log(f3comments)
+      //   setNewComments(f2comments)
+      // }
       setShowSlide((prev) => !prev);
+      // console.log(!slide)
+      changeSlide(!localslide);
+      localslide = !localslide
+      console.log(comments)
     }
   };
 
@@ -49,7 +72,7 @@ export default function Home() {
     <>
     <div className="flex flex-col h-screen bg-gray-900 text-white" style={{maxHeight: "100vh", overflow: "hidden"}}>
       {/* Overlay Image */}
-        <div className={`fixed top-0 left-0 w-full h-full z-0 fade ${showImage ? "show" : ""}`} style={{backgroundImage: "url('bg.png')", height: '100%', backgroundSize: 'contain', width: '100%', position: 'absolute', top: 0, left: 0, zIndex: 2}}>
+        <div className={`fixed top-0 left-0 w-full h-full z-0 fade ${showImage ? "show" : ""}`} style={{backgroundImage: "url('bg.png')", height: '100%', backgroundSize: 'contain', width: '100%', position: 'absolute', top: 0, left: 0, zIndex: 51}}>
         </div>
     </div>
     <div className={styles.container}>
@@ -65,7 +88,7 @@ export default function Home() {
                 }`}
               /> */}
               {showComments && comments
-                .filter(comment => comment.slideIndex === index)
+                .filter(comment => comment.slideIndex === localslide)
                 .map(comment => (
                   <div
                     key={comment.id}
@@ -76,7 +99,7 @@ export default function Home() {
                     }}
                   >
                     <div className={styles.tooltip}>
-                      <strong>{comment.name}</strong>: {comment.text}
+                      <strong>{comment.slideIndex}</strong>: {comment.text}
                     </div>
                   </div>
                 ))}
