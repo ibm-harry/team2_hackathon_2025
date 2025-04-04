@@ -99,7 +99,7 @@ export default function Home() {
                     }}
                   >
                     <div className={styles.tooltip}>
-                      <strong>{comment.slideIndex}</strong>: {comment.text}
+                      <strong>{comment.name}</strong>: {comment.text}
                     </div>
                   </div>
                 ))}
